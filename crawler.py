@@ -38,7 +38,6 @@ for i in range(0, len(cap)):
     symbol_ = symbol[i].text.strip().encode()
     cap_ = int(cap[i].text.strip().strip("$").replace(",", ""))
     if symbol_ in holder:
-        print symbol_ + ":" + str(cap_)
         total += cap_ * holder[symbol_]
 db = database.Connection(host="127.0.0.1",
                          database='blockindex',
@@ -46,6 +45,6 @@ db = database.Connection(host="127.0.0.1",
                          password='123456')
 
 index = int((total / base) * 1000)
-
+print index
 affected = db.execute_rowcount("INSERT INTO bindex (idx) VALUES(%s)" % index)
 print affected

@@ -1,1 +1,115 @@
-index.html
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="height:400px"></div>
+<!-- ECharts单文件引入 -->
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+    function getData() {
+        $.get("http://localhost:5000/index", function (data, status) {
+            if (status === "success") {
+                console.log(data);
+                doWrite(JSON.parse(data));
+            }
+        });
+    }
+
+    getData();
+
+    function doWrite(data) {
+        x_data = data.map(function (item) {
+            return item['createtime'];
+        });
+        y_data = data.map(function (item) {
+            return item['idx'];
+        });
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        require(
+            [
+                'echarts',
+                'echarts/chart/line'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('main'));
+                option = {
+
+                    // Make gradient line here
+                    visualMap: [{
+                        show: false,
+                        type: 'continuous',
+                        seriesIndex: 0,
+                        min: 0,
+                        max: 400
+                    }, {
+                        show: false,
+                        type: 'continuous',
+                        seriesIndex: 1,
+                        dimension: 0,
+                        min: 0,
+                        max: y_data.length - 1
+                    }],
+
+
+                    title: [{
+                        left: 'center',
+                        text: 'Gradient along the y axis'
+                    }, {
+                        top: '55%',
+                        left: 'center',
+                        text: 'Gradient along the x axis'
+                    }],
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: [{
+                        data: x_data
+                    }, {
+                        data: x_data,
+                        gridIndex: 1
+                    }],
+                    yAxis: [{
+                        splitLine: {show: false}
+                    }, {
+                        splitLine: {show: false},
+                        gridIndex: 1
+                    }],
+                    grid: [{
+                        bottom: '60%'
+                    }, {
+                        top: '60%'
+                    }],
+                    series: [{
+                        type: 'line',
+                        showSymbol: false,
+                        data: y_data
+                    }, {
+                        type: 'line',
+                        showSymbol: false,
+                        data: y_data,
+                        xAxisIndex: 1,
+                        yAxisIndex: 1
+                    }]
+                };
+
+                // 为echarts对象加载数据
+                myChart.setOption(option);
+            }
+        );
+    }
+</script>
+
+</body>
