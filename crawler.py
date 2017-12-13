@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 import database
 
-r = requests.get('https://www.coingecko.com/en?sort_by=market_cap')
+r = requests.get('https://coinmarketcap.com/')
 
 html_doc = r.text
 
@@ -12,12 +12,12 @@ soup = BeautifulSoup(html_doc, 'html.parser')
 
 
 def span_symbol(tag):
-    return tag.name == 'span' and tag.has_attr('class') and 'coin-content-symbol' in tag['class']
+    return tag.name == 'span' and tag.has_attr('class') and 'currency-symbol' in tag['class']
 
 
-def span_cap(tag):
-    return tag.name == 'span' and tag.has_attr('class') and 'currency-exchangable' in tag['class'] \
-           and tag.has_attr('data-market-cap-btc')
+def td_cap(tag):
+    return tag.name == 'td' and tag.has_attr('class') and 'market-cap' in tag['class'] \
+           and 'text-right' in tag['class'] and 'no-wrap' in tag['class']
 
 
 holder = {
@@ -31,9 +31,11 @@ holder = {
     "QTUM": 0.07
 }
 symbol = soup.find_all(span_symbol)
-cap = soup.find_all(span_cap)
+cap = soup.find_all(td_cap)
 total = 0
 base = 1.43797450258e+11
+print symbol
+print cap
 for i in range(0, len(cap)):
     symbol_ = symbol[i].text.strip().encode()
     cap_ = int(cap[i].text.strip().strip("$").replace(",", ""))
@@ -43,8 +45,6 @@ db = database.Connection(host="127.0.0.1",
                          database='blockindex',
                          user='root',
                          password='123456')
-
 index = int((total / base) * 1000)
-print index
-affected = db.execute_rowcount("INSERT INTO bindex (idx) VALUES(%s)" % index)
-print affected
+if index > 0:
+    affected = db.execute_rowcount("INSERT INTO bindex (idx) VALUES(%s)" % index)
