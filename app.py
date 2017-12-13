@@ -3,7 +3,6 @@ from flask import Flask
 import database
 import json
 import datetime
-from flask import render_template
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -28,7 +27,3 @@ def q_index():
                              password='123456')
     datas = db.query("SELECT createtime,idx FROM bindex")
     return json.dumps(datas, default=encoder)
-
-
-if __name__ == '__main__':
-    app.run(port=80)
