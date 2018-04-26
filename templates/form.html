@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>数据抓取</title>
+</head>
+
+<body>
+<center>
+    <h1>数据抓取</h1>
+    <form action="{{ url_for('crawler') }}" method="post">
+        <table border="1px solid">
+            <tr>
+                <td>分类</td>
+                <td>
+                    <select name="opId">
+                        <option value="45">全部</option>
+                        <option value="2306">裙装</option>
+                        <option value="54">T恤</option>
+                        <option value="56">裤装</option>
+                        <option value="53">套装</option>
+                        <option value="59">衬衫</option>
+                        <option value="2307">旗袍</option>
+                        <option value="46">上衣</option>
+                        <option value="58">大码女装</option>
+                        <option value="1725">中老年女装</option>
+                        <option value="2044">情侣装</option>
+                        <option value="60">其他</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="提交"></td>
+            </tr>
+        </table>
+    </form>
+</center>
+</body>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>数据抓取结果</title>
+</head>
+
+<body>
+<center>
+    <h1>数据抓取结果, <a href="{{ url_for('crawler') }}">返回</a></h1>
+    <table border="1px solid">
+        <tr>
+            <th>id</th>
+            <th>标题</th>
+            <th>价格</th>
+            <th>已拼</th>
+        </tr>
+        {% for res in data %}
+        <tr>
+            <td>{{res['id']}}</td>
+            <td>{{res['n']}}</td>
+            <td>{{res['p'] / 100}}</td>
+            <td>{{res['c']}}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+</center>
+</body>

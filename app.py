@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request
+from flask import Flask, request, render_template
 import database
 import json
 import datetime
@@ -30,10 +30,17 @@ def q_index():
     return json.dumps(datas, default=encoder)
 
 
-@app.route('/crawler', methods=['GET', 'POST'])
 @cross_origin(origin='*')
+@app.route('/crawler', methods=['GET', 'POST'])
 def crawler():
-    op_id = request.args['opId']
+    if request.method == 'GET':
+        return render_template('form.html')
+    else:
+        return do_crawler()
+
+
+def do_crawler():
+    op_id = request.form.get("opId")
     # page_id = int(request.args['pageId'])
     url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=0&size=100&sort_type=DEFAULT&flip=&pdduid=0"
     url = url_format % (op_id,)
@@ -48,4 +55,4 @@ def crawler():
     response = urllib2.urlopen(req, timeout=10).read()
     data_list = json.loads(response)['goods_list']
     res_list = [{'id': x['goods_id'], 'n': x['goods_name'], 'c': x['cnt'], 'p': x['group']['price']} for x in data_list]
-    return json.dumps({'data': res_list, 'code': '0'})
+    return render_template("data.html", data=res_list)
