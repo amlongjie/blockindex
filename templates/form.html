@@ -16,7 +16,7 @@
 
 <body>
 <center>
-    <h1>一级目录选择</h1>
+    <h1>数据抓取</h1>
     <div class="container">
         <form action="{{ url_for('crawler') }}" method="post" class="form-horizontal">
             <div class="form-group">
@@ -52,9 +52,12 @@
         $.getJSON($SCRIPT_ROOT + '/crawler_s', {
             opId: first_opt_id
         }, function (data) {
-            for (var d in data.result.data) {
-                var optionstring = "<option value=\"" + d.ID + "\" >" + d.n + "</option>";
+            var dd = JSON.parse(data.result)['data']
+            $("#optionSelector2").empty();
+            for(var i=0; i< dd.length; i++) {
+                var optionstring = "<option value=\"" + dd[i]['id'] + "\" >" + dd[i]['n'] + "</option>";
                 $("#optionSelector2").append(optionstring);
+
             }
         });
     }
