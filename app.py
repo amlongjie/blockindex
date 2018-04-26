@@ -40,7 +40,13 @@ def crawler():
         return render_template('form.html')
     else:
         op_id = request.form.get("opId")
-        res_list = do_crawler(op_id)
+        res_list = []
+        for page_id in range(0, 10):
+            res = do_crawler(op_id, page_id)
+            if res:
+                res_list.extend(res)
+            else:
+                break
         dir = os.path.split(os.path.realpath(__file__))[0] + '/excel/'
         uuid1 = uuid.uuid1()
         file_name = dir + '%s.xls' % uuid1
@@ -65,44 +71,17 @@ def crawler():
         return response
 
 
-@cross_origin(origin='*')
-@app.route('/export', methods=['GET'])
-def export():
-    op_id = request.args['opId']
-    res_list = do_crawler(op_id)
-    dir = os.path.split(os.path.realpath(__file__))[0] + '/excel/'
-    file_name = dir + '%s.xls' % uuid.uuid1()
-    write_workbook = xlwt.Workbook(encoding='utf-8')
-    write_sheet = write_workbook.add_sheet('Sheet 1', cell_overwrite_ok=True)
-    write_sheet.write(0, 0, "id")
-    write_sheet.write(0, 1, "名称")
-    write_sheet.write(0, 2, "价格")
-    write_sheet.write(0, 3, "已团")
-    for i in range(0, len(res_list)):
-        write_sheet.write(i + 1, 0, res_list[i]['id'])
-        write_sheet.write(i + 1, 1, res_list[i]['n'])
-        write_sheet.write(i + 1, 2, (res_list[i]['p'] * 1.0 / 100))
-        write_sheet.write(i + 1, 3, res_list[i]['c'])
-
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    write_workbook.save(file_name)
-
-    response = make_response(send_file(file_name))
-    response.headers["Content-Disposition"] = "attachment; filename={};".format(file_name)
-    return response
-
-
-def do_crawler(op_id):
+def do_crawler(op_id, page_id):
     # page_id = int(request.args['pageId'])
-    url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=0&size=1000&sort_type=DEFAULT&flip=&pdduid=0"
-    url = url_format % (op_id,)
+    url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=%s&size=100&sort_type=DEFAULT&flip=&pdduid=0"
+    url = url_format % (op_id, 100 * page_id)
     req_header = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-        'Accept': 'text/html;q=0.9,*/*;q=0.8',
-        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-        'Connection': 'close',
-        'Referer': None  # 注意如果依然不能抓取的话，这里可以设置抓取网站的host
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Host': 'apiv3.yangkeduo.com',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'max-age=0'
     }
     req = urllib2.Request(url, None, req_header)
     response = urllib2.urlopen(req, timeout=10).read()
