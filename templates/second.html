@@ -12,20 +12,20 @@
 
 <body>
 <center>
-    <h1>一级目录选择</h1>
+    <h1>二级目录选择</h1>
     <div class="container">
-        <form action="{{ url_for('crawler') }}" method="post" class="form-horizontal">
+        <form action="{{ url_for('crawler2') }}" method="post" class="form-horizontal">
             <div class="form-group">
                 <label for="optionSelector" class="col-sm-2 control-label">选择分类</label>
                 <div class="col-sm-10">
                     <select class="form-control" id="optionSelector" name="opId">
                         {% for res in data %}
-                        <option value="{{res['opt_id']}}">{{res['name']}}</option>
+                        <option value="{{res['id']}}">{{res['n']}}</option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">获取二级分类</button>
+            <button type="submit" class="btn btn-primary">导出数据</button>
         </form>
     </div>
 </center>
