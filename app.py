@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_file, make_response
 import database
 import json
 import datetime
 import urllib2
+import xlwt
+import os
+import uuid
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -36,13 +39,42 @@ def crawler():
     if request.method == 'GET':
         return render_template('form.html')
     else:
-        return do_crawler()
+        op_id = request.form.get("opId")
+        res_list = do_crawler(op_id)
+        return render_template("data.html", data=res_list, opId=op_id)
 
 
-def do_crawler():
-    op_id = request.form.get("opId")
+@cross_origin(origin='*')
+@app.route('/export', methods=['GET'])
+def export():
+    op_id = request.args['opId']
+    res_list = do_crawler(op_id)
+    dir = os.path.split(os.path.realpath(__file__))[0] + '/excel/'
+    file_name = dir + '%s.xls' % uuid.uuid1()
+    write_workbook = xlwt.Workbook(encoding='utf-8')
+    write_sheet = write_workbook.add_sheet('Sheet 1', cell_overwrite_ok=True)
+    write_sheet.write(0, 0, "id")
+    write_sheet.write(0, 1, "名称")
+    write_sheet.write(0, 2, "价格")
+    write_sheet.write(0, 3, "已团")
+    for i in range(0, len(res_list)):
+        write_sheet.write(i + 1, 0, res_list[i]['id'])
+        write_sheet.write(i + 1, 1, res_list[i]['n'])
+        write_sheet.write(i + 1, 2, (res_list[i]['p'] * 1.0 / 100))
+        write_sheet.write(i + 1, 3, res_list[i]['c'])
+
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    write_workbook.save(file_name)
+
+    response = make_response(send_file(file_name))
+    response.headers["Content-Disposition"] = "attachment; filename={};".format(file_name)
+    return response
+
+
+def do_crawler(op_id):
     # page_id = int(request.args['pageId'])
-    url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=0&size=100&sort_type=DEFAULT&flip=&pdduid=0"
+    url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=0&size=200&sort_type=DEFAULT&flip=&pdduid=0"
     url = url_format % (op_id,)
     req_header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
@@ -55,4 +87,4 @@ def do_crawler():
     response = urllib2.urlopen(req, timeout=10).read()
     data_list = json.loads(response)['goods_list']
     res_list = [{'id': x['goods_id'], 'n': x['goods_name'], 'c': x['cnt'], 'p': x['group']['price']} for x in data_list]
-    return render_template("data.html", data=res_list)
+    return res_list
