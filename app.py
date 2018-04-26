@@ -37,7 +37,8 @@ def q_index():
 @app.route('/crawler', methods=['GET', 'POST'])
 def crawler():
     if request.method == 'GET':
-        return render_template('form.html')
+        crawler_data = crawler_option_id()
+        return render_template('form.html', data=crawler_data)
     else:
         op_id = request.form.get("opId")
         res_list = []
@@ -71,17 +72,31 @@ def crawler():
         return response
 
 
+def crawler_option_id():
+    url = "http://apiv3.yangkeduo.com/operations?pdduid=7068208265&is_back=1"
+    req_header = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
+    }
+    req = urllib2.Request(url, None, req_header)
+    response = urllib2.urlopen(req, timeout=10).read()
+    op_list = json.loads(response)
+    res = []
+    for op in op_list:
+        name = op['opt_name']
+        children = op['children']
+        for child in children:
+            key = "%s/%s" % (name, child['opt_name'])
+            value = child['opt_id']
+            res.append({'name': key, 'opt_id': value})
+    return res
+
+
 def do_crawler(op_id, page_id):
     # page_id = int(request.args['pageId'])
     url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=%s&size=100&sort_type=DEFAULT&flip=&pdduid=0"
     url = url_format % (op_id, 100 * page_id)
     req_header = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-        'Host': 'apiv3.yangkeduo.com',
-        'Connection': 'keep-alive',
-        'Cache-Control': 'max-age=0'
     }
     req = urllib2.Request(url, None, req_header)
     response = urllib2.urlopen(req, timeout=10).read()
