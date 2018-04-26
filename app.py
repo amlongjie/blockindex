@@ -41,7 +41,28 @@ def crawler():
     else:
         op_id = request.form.get("opId")
         res_list = do_crawler(op_id)
-        return render_template("data.html", data=res_list, opId=op_id)
+        dir = os.path.split(os.path.realpath(__file__))[0] + '/excel/'
+        uuid1 = uuid.uuid1()
+        file_name = dir + '%s.xls' % uuid1
+        write_workbook = xlwt.Workbook(encoding='utf-8')
+        write_sheet = write_workbook.add_sheet('Sheet 1', cell_overwrite_ok=True)
+        write_sheet.write(0, 0, "id")
+        write_sheet.write(0, 1, "名称")
+        write_sheet.write(0, 2, "价格")
+        write_sheet.write(0, 3, "已团")
+        for i in range(0, len(res_list)):
+            write_sheet.write(i + 1, 0, res_list[i]['id'])
+            write_sheet.write(i + 1, 1, res_list[i]['n'])
+            write_sheet.write(i + 1, 2, (res_list[i]['p'] * 1.0 / 100))
+            write_sheet.write(i + 1, 3, res_list[i]['c'])
+
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        write_workbook.save(file_name)
+
+        response = make_response(send_file(file_name))
+        response.headers["Content-Disposition"] = "attachment; filename=%s.xls;" % uuid1
+        return response
 
 
 @cross_origin(origin='*')
