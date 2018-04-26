@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, render_template, send_file, make_response
+from flask import Flask, request, render_template, send_file, make_response, jsonify
 import database
 import json
 import datetime
@@ -80,6 +80,14 @@ def crawler():
         return render_template('second.html', data=res_list)
 
 
+@cross_origin(origin='*')
+@app.route('/crawler_s', methods=['GET', 'POST'])
+def crawler_s():
+    op_id = request.args.get("opId")
+    res_list = do_crawler_opt(op_id)
+    return jsonify(result=json.dumps({'data': res_list}))
+
+
 def crawler_option_id():
     url = "http://apiv3.yangkeduo.com/operations?pdduid=7068208265&is_back=1"
     req_header = {
@@ -88,7 +96,7 @@ def crawler_option_id():
     req = urllib2.Request(url, None, req_header)
     response = urllib2.urlopen(req, timeout=10).read()
     op_list = json.loads(response)
-    res = []
+    res = [{'name': u'请选择', 'opt_id': -1}]
     for op in op_list:
         name = op['opt_name']
         children = op['children']
