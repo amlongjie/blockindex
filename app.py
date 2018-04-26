@@ -74,7 +74,7 @@ def export():
 
 def do_crawler(op_id):
     # page_id = int(request.args['pageId'])
-    url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=0&size=200&sort_type=DEFAULT&flip=&pdduid=0"
+    url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=0&size=1000&sort_type=DEFAULT&flip=&pdduid=0"
     url = url_format % (op_id,)
     req_header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
