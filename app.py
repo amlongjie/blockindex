@@ -3,10 +3,12 @@ from flask import Flask, request, render_template, send_file, make_response, jso
 import database
 import json
 import datetime
-import urllib2
 import xlwt
 import os
 import uuid
+import time
+import urllib
+import urllib2
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -41,6 +43,10 @@ def crawler():
         return render_template('form.html', data=crawler_data)
     else:
         op_id = request.form.get("opId")
+        first_n = request.form.get("first_n").encode("utf-8")
+        second_n = request.form.get("second_n").encode("utf-8")
+        name = "%s.xls" % uuid.uuid1()
+
         res_list = []
         for page_id in range(0, 10):
             res = do_crawler(op_id, page_id)
@@ -48,9 +54,8 @@ def crawler():
                 res_list.extend(res)
             else:
                 break
-        dir = os.path.split(os.path.realpath(__file__))[0] + '/excel/'
-        uuid1 = uuid.uuid1()
-        file_name = dir + '%s.xls' % uuid1
+        dir_ = os.path.split(os.path.realpath(__file__))[0] + '/excel/'
+        full_file_name = dir_ + '%s' % name
         write_workbook = xlwt.Workbook(encoding='utf-8')
         write_sheet = write_workbook.add_sheet('Sheet 1', cell_overwrite_ok=True)
         write_sheet.write(0, 0, "id")
@@ -63,12 +68,19 @@ def crawler():
             write_sheet.write(i + 1, 2, (res_list[i]['p'] * 1.0 / 100))
             write_sheet.write(i + 1, 3, res_list[i]['c'])
 
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        write_workbook.save(file_name)
+        if not os.path.exists(dir_):
+            os.makedirs(dir_)
+        write_workbook.save(full_file_name)
 
-        response = make_response(send_file(file_name))
-        response.headers["Content-Disposition"] = "attachment; filename=%s.xls;" % uuid1
+        response = make_response(send_file(full_file_name))
+        download_name = name
+        if not first_n or not second_n:
+            pass
+        else:
+            download_name = urllib.pathname2url("%s-%s-%s.xls" % (first_n, second_n, time.strftime("%Y-%m-%d")))
+            # time.strftime("%Y-%m-%d")
+        response.headers["Content-Disposition"] = "attachment; filename=%s; filename*=utf-8''%s" % (
+            download_name, download_name)
         return response
 
 

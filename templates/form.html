@@ -18,7 +18,7 @@
 <center>
     <h1>数据抓取</h1>
     <div class="container">
-        <form action="{{ url_for('crawler') }}" method="post" class="form-horizontal">
+        <form action="{{ url_for('crawler') }}" method="post" class="form-horizontal" id="crawler_form">
             <div class="form-group">
                 <label for="optionSelector" class="col-sm-2 control-label">一级分类</label>
                 <div class="col-sm-10">
@@ -39,7 +39,9 @@
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">导出</button>
+            <input type="hidden" name="first_n" id="first_n">
+            <input type="hidden" name="second_n" id="second_n">
+            <button type="button" class="btn btn-primary" onclick="submitButton()">导出</button>
         </form>
     </div>
 </center>
@@ -47,14 +49,22 @@
 
 
 <script>
+
+    function submitButton() {
+        $("#first_n").val($("#optionSelector").find("option:selected").text());
+        $("#second_n").val($("#optionSelector2").find("option:selected").text());
+        $("#crawler_form").submit();
+
+    }
+
     function cChange() {
         $("#optionSelector2").empty();
-        var first_opt_id = $("#optionSelector").val()
+        var first_opt_id = $("#optionSelector").val();
         $.getJSON($SCRIPT_ROOT + '/crawler_s', {
             opId: first_opt_id
         }, function (data) {
-            var dd = JSON.parse(data.result)['data']
-            for(var i=0; i< dd.length; i++) {
+            var dd = JSON.parse(data.result)['data'];
+            for (var i = 0; i < dd.length; i++) {
                 var optionstring = "<option value=\"" + dd[i]['id'] + "\" >" + dd[i]['n'] + "</option>";
                 $("#optionSelector2").append(optionstring);
 
