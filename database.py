@@ -68,6 +68,10 @@ class Connection(object):
     def __init__(self, host, database, user=None, password=None,
                  max_idle_time=7 * 3600, connect_timeout=0,
                  time_zone="+8:00", port = 3306):
+        """
+
+        :rtype:
+        """
         self.host = host
         self.database = database
         self.max_idle_time = float(max_idle_time)

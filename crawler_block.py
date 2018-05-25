@@ -19,13 +19,14 @@ def crawler_otc(url):
     soup = BeautifulSoup(html_doc, 'html.parser')
     symbol = soup.find_all(price_content)
     lowest = symbol[0].text
-    return lowest.split("\n")[2].strip()
+    return int(100 * float(lowest.split("\n")[2].strip()))
 
 
 def crawler_current(url):
     r = do_crawler(url)
     data = cjson.decode(r)['data']
-    return Decimal(float(data['detail']['price']) * float(data['rate'])).quantize(Decimal('0.00')), float(data['rate'])
+    return Decimal(float(data['detail']['price']) * float(data['rate']) * 100).quantize(Decimal('0')), float(
+        data['rate'])
 
 
 def crawler_money_flow(url, usd_rate):
@@ -46,9 +47,16 @@ cur_money_flow_price = crawler_money_flow('https://block.cc/api/v1/coin/get?coin
 
 print otc_eos_buy_price, otc_eos_sell_price, cur_eos_price, cur_money_flow_price
 
-# db = database.Connection(host="127.0.0.1",
-#                          database='blockindex',
-#                          user='root',
-#                          password='123456')
+db = database.Connection(host="127.0.0.1",
+                         database='blockindex',
+                         user='root',
+                         password='root')
+sql = "INSERT INTO `otc_index` (otc_buy, otc_sell, real_price, minute_money_in, hour_money_in, day_money_in, " \
+      "week_money_in,token) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)" % (
+          otc_eos_buy_price, otc_eos_sell_price, cur_eos_price, cur_money_flow_price['30m'], cur_money_flow_price['1h'],
+          cur_money_flow_price['1d'], cur_money_flow_price['1w'], '"eos"')
+print sql
+affected = db.execute_rowcount(sql)
+print affected
 #
 # affected = db.execute_rowcount("INSERT INTO bindex (idx) VALUES(%s)" % index)
