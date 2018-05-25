@@ -58,5 +58,3 @@ sql = "INSERT INTO `otc_index` (otc_buy, otc_sell, real_price, minute_money_in, 
 print sql
 affected = db.execute_rowcount(sql)
 print affected
-#
-# affected = db.execute_rowcount("INSERT INTO bindex (idx) VALUES(%s)" % index)

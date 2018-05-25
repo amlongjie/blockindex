@@ -10,6 +10,7 @@ import time
 import urllib
 import urllib2
 from flask_cors import CORS, cross_origin
+import cjson
 
 app = Flask(__name__)
 CORS(app)
@@ -137,3 +138,18 @@ def do_crawler_opt(op_id):
     res = [{'id': op_id, 'n': u'全部'}]
     res.extend([{'id': x['id'], 'n': x['opt_name']} for x in opt_info])
     return res
+
+
+@cross_origin(origin='*')
+@app.route('/get_all', methods=['GET', 'POST'])
+def do_get_all_data():
+    db = database.Connection(host="127.0.0.1",
+                             database='blockindex',
+                             user='root',
+                             password='root')
+    # jsonify(result=json.dumps({'data': res_list}))
+    datas = db.query("SELECT * FROM otc_index order by id desc")
+    res = {'code': 200}
+    data = [{'buy': x['otc_buy'], 'datetime': str(x['create_time'])} for x in datas]
+    res['data'] = data
+    return jsonify(res)
