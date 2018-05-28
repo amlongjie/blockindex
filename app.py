@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, request, render_template, send_file, make_response, jsonify
-import database
-import json
 import datetime
-import xlwt
+import json
 import os
-import uuid
 import time
 import urllib
 import urllib2
+import uuid
+
+import xlwt
+from flask import Flask, request, render_template, send_file, make_response, jsonify
 from flask_cors import CORS, cross_origin
-import cjson
+
+import database
 
 app = Flask(__name__)
 CORS(app)
@@ -155,3 +156,18 @@ def do_get_all_data():
              'd_flow': x['day_money_in'], 'w_flow': x['week_money_in']} for x in datas]
     res['data'] = data
     return jsonify(res)
+
+
+@cross_origin(origin='*')
+@app.route('/reset/email', methods=['GET', 'POST'])
+def reset_email():
+    if request.method == 'GET':
+        return render_template("reset.html")
+    else:
+        next = request.form.get("next")
+        db = database.Connection(host="127.0.0.1",
+                                 database='blockindex',
+                                 user='root',
+                                 password='123456')
+        affect = db.execute_rowcount("UPDATE flag set flag = 0, next=%s WHERE id = 1" % next)
+        return jsonify({'code': 200, 'affect': affect})

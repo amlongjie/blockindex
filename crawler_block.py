@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from crawler.crawler_api import do_crawler
 import cjson
 from decimal import Decimal
+from cemail.email_sender import send_mail
 
 import database
 
@@ -45,7 +46,7 @@ otc_eos_sell_price = crawler_otc('https://otcbtc.com/buy_offers?currency=eos&fia
 cur_eos_price, cur_usd_rate = crawler_current('https://api.schail.com/v1/ticker/summary/detail?id=eos')
 cur_money_flow_price = crawler_money_flow('https://block.cc/api/v1/coin/get?coin=eos', cur_usd_rate)
 
-print otc_eos_buy_price, otc_eos_sell_price, cur_eos_price, cur_money_flow_price
+send_mail(otc_eos_sell_price)
 
 db = database.Connection(host="127.0.0.1",
                          database='blockindex',
@@ -55,6 +56,5 @@ sql = "INSERT INTO `otc_index` (otc_buy, otc_sell, real_price, minute_money_in, 
       "week_money_in,token) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)" % (
           otc_eos_buy_price, otc_eos_sell_price, cur_eos_price, cur_money_flow_price['30m'], cur_money_flow_price['1h'],
           cur_money_flow_price['1d'], cur_money_flow_price['1w'], '"eos"')
-print sql
+
 affected = db.execute_rowcount(sql)
-print affected
