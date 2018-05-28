@@ -25,8 +25,7 @@ def send_mail(otc_eos_sell_price):
     msg['From'] = me
     msg['To'] = ";".join(mailto_list)
     try:
-        server = smtplib.SMTP()
-        server.connect(mail_host)
+        server = smtplib.SMTP_SSL("smtp.163.com", "465")
         server.login(mail_user, mail_pass)
         server.sendmail(me, mailto_list, msg.as_string())
         server.close()
