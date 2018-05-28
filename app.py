@@ -146,8 +146,8 @@ def do_get_all_data():
     db = database.Connection(host="127.0.0.1",
                              database='blockindex',
                              user='root',
-                             password='root')
-    datas = db.query("SELECT * FROM otc_index order by id desc")
+                             password='123456')
+    datas = db.query("SELECT * FROM otc_index order by id asc")
     res = {'code': 200}
     data = [{'buy': x['otc_buy'], 'datetime': str(x['create_time']),
              'sell': x['otc_sell'], 'm_flow': x['minute_money_in'],
