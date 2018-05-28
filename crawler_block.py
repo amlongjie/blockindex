@@ -50,7 +50,7 @@ print otc_eos_buy_price, otc_eos_sell_price, cur_eos_price, cur_money_flow_price
 db = database.Connection(host="127.0.0.1",
                          database='blockindex',
                          user='root',
-                         password='root')
+                         password='123456')
 sql = "INSERT INTO `otc_index` (otc_buy, otc_sell, real_price, minute_money_in, hour_money_in, day_money_in, " \
       "week_money_in,token) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)" % (
           otc_eos_buy_price, otc_eos_sell_price, cur_eos_price, cur_money_flow_price['30m'], cur_money_flow_price['1h'],
