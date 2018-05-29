@@ -46,7 +46,7 @@ otc_eos_sell_price = crawler_otc('https://otcbtc.com/buy_offers?currency=eos&fia
 cur_eos_price, cur_usd_rate = crawler_current('https://api.schail.com/v1/ticker/summary/detail?id=eos')
 cur_money_flow_price = crawler_money_flow('https://block.cc/api/v1/coin/get?coin=eos', cur_usd_rate)
 
-send_mail(otc_eos_sell_price)
+send_mail(otc_eos_buy_price)
 
 db = database.Connection(host="127.0.0.1",
                          database='blockindex',

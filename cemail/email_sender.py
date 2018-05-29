@@ -15,7 +15,7 @@ def send_mail(otc_eos_sell_price):
     if repeat['flag'] == 1:
         return
 
-    if otc_eos_sell_price < repeat['next']:
+    if otc_eos_sell_price / 100 < repeat['next']:
         return
     content = "EOS目前价格:%s" % str(otc_eos_sell_price)
 
