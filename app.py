@@ -154,10 +154,10 @@ def do_get_all_data():
              'datetime': str(x['create_time']),
              'sell': x['otc_sell'] - datas[0]['otc_sell'],
              'cur': x['real_price'] - datas[0]['real_price'],
-             'm_flow': x['minute_money_in'],
-             'h_flow': x['hour_money_in'],
-             'd_flow': x['day_money_in'],
-             'w_flow': x['week_money_in']}
+             'm_flow': x['minute_money_in'] - datas[0]['minute_money_in'],
+             'h_flow': x['hour_money_in'] - datas[0]['hour_money_in'],
+             'd_flow': x['day_money_in'] - datas[0]['day_money_in'],
+             'w_flow': x['week_money_in'] - datas[0]['week_money_in']}
             for x in datas]
     res['data'] = data
     return jsonify(res)
