@@ -150,10 +150,10 @@ def do_get_all_data():
                              password='123456')
     datas = db.query("SELECT * FROM otc_index order by id asc")
     res = {'code': 200}
-    data = [{'buy': x['otc_buy'] - x['real_price'],
+    data = [{'buy': x['otc_buy'],
              'datetime': str(x['create_time']),
-             'sell': x['otc_sell'] - x['real_price'],
-             'cur': x['real_price'] - datas[0]['real_price'],
+             'sell': x['otc_sell'],
+             'cur': x['real_price'],
              'm_flow': x['minute_money_in'] - datas[0]['minute_money_in'],
              'h_flow': x['hour_money_in'] - datas[0]['hour_money_in'],
              'd_flow': x['day_money_in'] - datas[0]['day_money_in'],
@@ -161,6 +161,9 @@ def do_get_all_data():
             for x in datas]
     res['data'] = data
     return jsonify(res)
+
+
+# 分析价格,溢价
 
 
 @cross_origin(origin='*')
