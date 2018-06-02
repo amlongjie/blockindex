@@ -19,6 +19,7 @@ CREATE TABLE `otc_index` (
   `week_money_in`   INT(11)   NOT NULL DEFAULT '0',
   `token`           CHAR(3)   NOT NULL DEFAULT '',
   `create_time`     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `online_num`      INT(11)   NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
