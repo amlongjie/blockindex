@@ -6,10 +6,12 @@ import time
 import urllib
 import urllib2
 import uuid
+import cjson
 
 import xlwt
 from flask import Flask, request, render_template, send_file, make_response, jsonify
 from flask_cors import CORS, cross_origin
+from crawler.crawler_api import do_crawler
 
 import database
 
@@ -51,7 +53,7 @@ def crawler():
 
         res_list = []
         for page_id in range(0, 10):
-            res = do_crawler(op_id, page_id)
+            res = do_crawler_0(op_id, page_id)
             if res:
                 res_list.extend(res)
             else:
@@ -113,7 +115,7 @@ def crawler_option_id():
     return res
 
 
-def do_crawler(op_id, page_id):
+def do_crawler_0(op_id, page_id):
     # page_id = int(request.args['pageId'])
     url_format = "http://apiv3.yangkeduo.com/v4/operation/%s/groups?opt_type=3&offset=%s&size=100&sort_type=DEFAULT&flip=&pdduid=0"
     url = url_format % (op_id, 100 * page_id)
@@ -164,6 +166,84 @@ def do_get_all_data():
 
 
 # 分析价格,溢价
+@cross_origin(origin='*')
+@app.route('/eos/day', methods=['GET'])
+def crawler_eos_by_day():
+    now = int(round(time.time() * 1000))
+    start = now - 1000 * 60 * 60 * 24
+    r = do_crawler("https://graphs2.coinmarketcap.com/currencies/eos/%s/%s/" % (start, now))
+    data = cjson.decode(r)['price_usd']
+    for d in data:
+        value = time.localtime(d[0] / 1000)
+        format_str = '%Y-%m-%d %H:%M:%S'
+        dt = time.strftime(format_str, value)
+        d[0] = dt
+
+    return jsonify({'code': 200, 'data': data})
+
+
+@cross_origin(origin='*')
+@app.route('/eos/week', methods=['GET'])
+def crawler_eos_by_week():
+    now = int(round(time.time() * 1000))
+    start = now - 1000 * 60 * 60 * 24 * 7
+    r = do_crawler("https://graphs2.coinmarketcap.com/currencies/eos/%s/%s/" % (start, now))
+    data = cjson.decode(r)['price_usd']
+    for d in data:
+        value = time.localtime(d[0] / 1000)
+        format_str = '%Y-%m-%d %H:%M:%S'
+        dt = time.strftime(format_str, value)
+        d[0] = dt
+
+    return jsonify({'code': 200, 'data': data})
+
+
+@cross_origin(origin='*')
+@app.route('/eos/month', methods=['GET'])
+def crawler_eos_by_month():
+    now = int(round(time.time() * 1000))
+    start = now - 1000 * 60 * 60 * 24 * 30
+    r = do_crawler("https://graphs2.coinmarketcap.com/currencies/eos/%s/%s/" % (start, now))
+    data = cjson.decode(r)['price_usd']
+    for d in data:
+        value = time.localtime(d[0] / 1000)
+        format_str = '%Y-%m-%d %H:%M:%S'
+        dt = time.strftime(format_str, value)
+        d[0] = dt
+
+    return jsonify({'code': 200, 'data': data})
+
+
+@cross_origin(origin='*')
+@app.route('/eos/year', methods=['GET'])
+def crawler_eos_by_year():
+    now = int(round(time.time() * 1000))
+    start = now - 1000 * 60 * 60 * 24 * 365
+    r = do_crawler("https://graphs2.coinmarketcap.com/currencies/eos/%s/%s/" % (start, now))
+    data = cjson.decode(r)['price_usd']
+    for d in data:
+        value = time.localtime(d[0] / 1000)
+        format_str = '%Y-%m-%d %H:%M:%S'
+        dt = time.strftime(format_str, value)
+        d[0] = dt
+
+    return jsonify({'code': 200, 'data': data})
+
+
+@cross_origin(origin='*')
+@app.route('/eos/all', methods=['GET'])
+def crawler_eos_by_all():
+    now = int(round(time.time() * 1000))
+    start = 1356969600000
+    r = do_crawler("https://graphs2.coinmarketcap.com/currencies/eos/%s/%s/" % (start, now))
+    data = cjson.decode(r)['price_usd']
+    for d in data:
+        value = time.localtime(d[0] / 1000)
+        format_str = '%Y-%m-%d %H:%M:%S'
+        dt = time.strftime(format_str, value)
+        d[0] = dt
+
+    return jsonify({'code': 200, 'data': data})
 
 
 @cross_origin(origin='*')
